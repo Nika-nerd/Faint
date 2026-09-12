@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Faint.Console/Faint.Console.csproj" />
+    <Project Path="src/Faint.Core/Faint.Core.csproj" />
+    <Project Path="src/Faint.Infr/Faint.Infr.csproj" />
+    <Project Path="src/Faint.Serv/Faint.Serv.csproj" />
+  </Folder>
+</Solution>
