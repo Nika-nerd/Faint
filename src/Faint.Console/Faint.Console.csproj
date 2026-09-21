@@ -1,7 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\Faint.Serv\Faint.Serv.csproj" />
+    <ProjectReference Include="..\Faint.Infrastructure\Faint.Infrastructure.csproj" />
+    <ProjectReference Include="..\Faint.Core\Faint.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.12" />
   </ItemGroup>
 
   <PropertyGroup>
