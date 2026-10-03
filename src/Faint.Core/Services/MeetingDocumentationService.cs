@@ -43,7 +43,6 @@ Formatting guidelines:
         _presentationParser = presentationParser;
     }
 
-    // Вся логика должна быть в этом методе
     public async Task<string> ProcessMeetingAudioAsync(string inputAudioPath, string? presentationPath = null, string? customPrompt = null, CancellationToken cancellationToken = default)
     {
         string? tempWavFilePath = null;
@@ -60,7 +59,6 @@ Formatting guidelines:
                 return "The audio file does not contain any recognizable speech.";
             }
 
-            // 3. Достаем текст из презентации (если есть)
             string presentationText = string.Empty;
             if(!string.IsNullOrEmpty(presentationPath) && _presentationParser != null)
             {
@@ -69,7 +67,6 @@ Formatting guidelines:
 
             var prompt = string.IsNullOrWhiteSpace(customPrompt) ? DefaultSystemPrompt : customPrompt;
 
-            // 4. Добавляем жесткие правила для презентации в промпт
             if (!string.IsNullOrWhiteSpace(presentationText))
             {
                 prompt += @"
@@ -84,12 +81,10 @@ CRITICAL RULE REGARDING PRESENTATION SLIDES:
                 textContent.Content = $"--- AUDIO TRANSCRIPT (PRIMARY SOURCE) ---\n{textContent.Content}\n\n--- PRESENTATION SLIDES TEXT (REFERENCE ONLY) ---\n{presentationText}";
             }
 
-            // 5. Отправляем в LLM
             return await _llmDocumentGenerator.GenerateDocumentationAsync(textContent, prompt, cancellationToken);
         }
         finally
         {
-            // 6. Удаляем временный WAV файл
             if (!string.IsNullOrEmpty(tempWavFilePath) && File.Exists(tempWavFilePath))
             {
                 File.Delete(tempWavFilePath);

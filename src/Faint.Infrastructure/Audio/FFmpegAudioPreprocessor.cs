@@ -12,7 +12,6 @@ public class FFmpegAudioPreprocessor : IAudioPreprocessor
             throw new FileNotFoundException("Входной аудиофайл не найден.", inputFilePath);
         }
 
-        // Формируем путь для выходного файла в той же папке
         var directory = Path.GetDirectoryName(inputFilePath) ?? string.Empty;
         var fileName = Path.GetFileNameWithoutExtension(inputFilePath);
         var outputFilePath = Path.Combine(directory, $"{fileName}_16khz.wav");
@@ -36,7 +35,6 @@ public class FFmpegAudioPreprocessor : IAudioPreprocessor
         using var process = new Process { StartInfo = processInfo };
         process.Start();
 
-        // Ожидаем завершения конвертации
         await process.WaitForExitAsync(cancellationToken);
 
         if (process.ExitCode != 0)

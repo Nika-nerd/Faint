@@ -12,7 +12,6 @@ public class OpenAiDocumentGenerator : ILlmDocumentGenerator
     private readonly string _model;
     private readonly HttpClient _httpClient;
 
-    // Используем gpt-4o или gpt-4-turbo, так как у них большое окно контекста
     public OpenAiDocumentGenerator(string apiKey, string model = "gpt-4o")
     {
         _apiKey = apiKey;
@@ -31,7 +30,7 @@ public class OpenAiDocumentGenerator : ILlmDocumentGenerator
                 new { role = "system", content = systemPrompt },
                 new { role = "user", content = transcribedText.Content }
             },
-            temperature = 0.3 // Низкая температура для точности и строгости фактов
+            temperature = 0.3 
         };
 
         var jsonContent = new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");

@@ -9,7 +9,6 @@ public class WhisperAudioTranscriber : IAudioTranscriber
 {
     private readonly string _modelPath;
 
-    // Меняем значение по умолчанию на small
     public WhisperAudioTranscriber(string modelPath = "ggml-small.bin")
     {
         _modelPath = modelPath;
@@ -22,10 +21,8 @@ public class WhisperAudioTranscriber : IAudioTranscriber
             throw new FileNotFoundException("Аудиофайл не найден", audioFilePath);
         }
 
-        // Автоматически определяем тип модели из названия файла (Small или Base)
         GgmlType type = _modelPath.Contains("small", StringComparison.OrdinalIgnoreCase) ? GgmlType.Small : GgmlType.Base;
 
-        // Передаем правильный тип в метод загрузки
         await EnsureModelDownloadedAsync(_modelPath, type, cancellationToken);
 
         using var whisperFactory = WhisperFactory.FromPath(_modelPath);
@@ -65,11 +62,9 @@ public class WhisperAudioTranscriber : IAudioTranscriber
             Directory.CreateDirectory(directory);
         }
 
-        // --- ИСПРАВЛЕНИЕ ЗДЕСЬ ---
         using var httpClient = new HttpClient();
         var downloader = new WhisperGgmlDownloader(httpClient);
         await using var modelStream = await downloader.GetGgmlModelAsync(modelType, cancellationToken: cancellationToken);
-        // -------------------------
 
         await using var fileWriter = File.Create(modelPath);
         await modelStream.CopyToAsync(fileWriter, cancellationToken);

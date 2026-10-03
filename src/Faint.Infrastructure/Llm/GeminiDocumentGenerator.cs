@@ -30,7 +30,7 @@ public class GeminiDocumentGenerator : ILlmDocumentGenerator
             {
                 new { parts = new[] { new { text = transcribedText.Content } } }
             },
-            generationConfig = new { temperature = 0.1 } // Низкая температура для структурированной документации
+            generationConfig = new { temperature = 0.1 } 
         };
 
         var jsonContent = new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");

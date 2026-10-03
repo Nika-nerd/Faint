@@ -21,7 +21,6 @@ public class PptxPresentationParser : IPresentationParser
                     cancellationToken.ThrowIfCancellationRequested();
                     if (slidePart.Slide != null)
                     {
-                        // Извлекаем все текстовые узлы со слайда
                         foreach (var text in slidePart.Slide.Descendants<DocumentFormat.OpenXml.Drawing.Text>())
                         {
                             sb.Append(text.Text + " ");
