@@ -1,13 +1,19 @@
-﻿using Faint.Core.Interfaces;
+﻿using System;
+using System.IO;
+using DotNetEnv;
+using Microsoft.Extensions.DependencyInjection;
+using Faint.Core.Interfaces;
+using Faint.Core.Services;
 using Faint.Infrastructure.Audio;
 using Faint.Infrastructure.Llm;
-using Faint.Core.Services;
-using Microsoft.Extensions.DependencyInjection;
+using Faint.Infrastructure.Presentations;
 
 Console.WriteLine("=== Faint Audio Transcriber ===");
 
-// Теперь можно использовать любой формат, например .mp3 или .m4a
+Env.Load();
+
 string audioPath = "lecture.mp3"; 
+string? presentationPath = "presentation.pptx";
 
 if (!File.Exists(audioPath))
 {
@@ -15,18 +21,17 @@ if (!File.Exists(audioPath))
     return;
 }
 
-// Настройка Dependency Injection
 var services = new ServiceCollection();
 
 services.AddTransient<IAudioPreprocessor, FFmpegAudioPreprocessor>();
-services.AddTransient<IAudioTranscriber>(sp => new WhisperAudioTranscriber("ggml-base.bin"));
+services.AddTransient<IAudioTranscriber>(sp => new WhisperAudioTranscriber("ggml-small.bin"));
 
-// --- ОТКЛЮЧАЕМ ПЛАТНЫЙ OPENAI ---
-// string openAiApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY") ?? "ВАШ_OPENAI_API_КЛЮЧ";
-// services.AddTransient<ILlmDocumentGenerator>(sp => new OpenAiDocumentGenerator(openAiApiKey));
+string geminiApiKey = Environment.GetEnvironmentVariable("GEMINI_API_KEY") 
+    ?? throw new InvalidOperationException("API ключ Gemini не найден! Укажите GEMINI_API_KEY в файле .env");
 
-// --- ВКЛЮЧАЕМ БЕСПЛАТНУЮ ЗАГЛУШКУ ---
-services.AddTransient<ILlmDocumentGenerator, MockLlmDocumentGenerator>();
+services.AddTransient<ILlmDocumentGenerator>(sp => new GeminiDocumentGenerator(geminiApiKey));
+
+services.AddTransient<IPresentationParser, UniversalPresentationParser>();
 
 services.AddTransient<MeetingDocumentationService>();
 
@@ -34,11 +39,8 @@ var serviceProvider = services.BuildServiceProvider();
 
 Console.WriteLine("Запуск процесса (Конвертация -> Транскрибация -> Генерация документации)...");
 
-// Получаем наш главный сервис-оркестратор из DI
 var docService = serviceProvider.GetRequiredService<MeetingDocumentationService>();
-
-// Запускаем весь процесс
-var resultMarkdown = await docService.ProcessMeetingAudioAsync(audioPath);
+var resultMarkdown = await docService.ProcessMeetingAudioAsync(audioPath, presentationPath);
 
 Console.WriteLine("\n--- Итоговая документация (Markdown) ---");
 Console.WriteLine(resultMarkdown);
