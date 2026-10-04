@@ -10,9 +10,9 @@ public class MeetingDocumentationService
     private readonly IPresentationParser? _presentationParser; // Не забываем парсер презентаций
 
     // Мощный системный промпт на английском языке
-    private const string DefaultSystemPrompt = @"You are an expert technical writer and academic analyst. 
+        private const string DefaultSystemPromptTemplate = @"You are an expert technical writer and academic analyst. 
 You are provided with a raw transcript of an extended meeting or lecture. 
-Your task is to create an exhaustive, highly detailed, and well-structured documentation in English using Markdown.
+Your task is to create an exhaustive, highly detailed, and well-structured documentation in {0} using Markdown.
 
 CRITICAL INSTRUCTIONS FOR COVERAGE:
 - The AUDIO TRANSCRIPT is your primary source of truth. The lecture's meaning comes from what was spoken.
@@ -28,7 +28,7 @@ DOCUMENT STRUCTURE:
 
 Formatting guidelines:
 - Use clean Markdown with bolding, sub-headings, and bullet points.
-- Maintain professional, precise, and grammatically perfect English.";
+- Maintain professional, precise, and grammatically perfect {0}.";
 
     // Конструктор только принимает зависимости
     public MeetingDocumentationService(
@@ -43,7 +43,7 @@ Formatting guidelines:
         _presentationParser = presentationParser;
     }
 
-    public async Task<string> ProcessMeetingAudioAsync(string inputAudioPath, string? presentationPath = null, string? customPrompt = null, CancellationToken cancellationToken = default)
+    public async Task<string> ProcessMeetingAudioAsync(string inputAudioPath, string? presentationPath = null, string targetLanguage = "English", string? customPrompt = null, CancellationToken cancellationToken = default)
     {
         string? tempWavFilePath = null;
         try
@@ -65,7 +65,10 @@ Formatting guidelines:
                 presentationText = await _presentationParser.ExtractTextAsync(presentationPath, cancellationToken);
             }
 
-            var prompt = string.IsNullOrWhiteSpace(customPrompt) ? DefaultSystemPrompt : customPrompt;
+            // Подставляем язык в промпт
+            var prompt = string.IsNullOrWhiteSpace(customPrompt) 
+                ? string.Format(DefaultSystemPromptTemplate, targetLanguage) 
+                : customPrompt;
 
             if (!string.IsNullOrWhiteSpace(presentationText))
             {

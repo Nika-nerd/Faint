@@ -27,7 +27,7 @@ public class WhisperAudioTranscriber : IAudioTranscriber
 
         using var whisperFactory = WhisperFactory.FromPath(_modelPath);
         using var processor = whisperFactory.CreateBuilder()
-            .WithLanguage("en")
+            .WithLanguage("auto")
             .Build();
 
         await using var fileStream = File.OpenRead(audioFilePath);

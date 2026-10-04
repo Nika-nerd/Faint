@@ -14,6 +14,7 @@ Env.Load();
 
 string audioPath = "lecture.mp3"; 
 string? presentationPath = "presentation.pptx";
+string targetLanguage = "Russian";
 
 if (!File.Exists(audioPath))
 {
@@ -40,7 +41,7 @@ var serviceProvider = services.BuildServiceProvider();
 Console.WriteLine("Запуск процесса (Конвертация -> Транскрибация -> Генерация документации)...");
 
 var docService = serviceProvider.GetRequiredService<MeetingDocumentationService>();
-var resultMarkdown = await docService.ProcessMeetingAudioAsync(audioPath, presentationPath);
+var resultMarkdown = await docService.ProcessMeetingAudioAsync(audioPath, presentationPath, targetLanguage);
 
 Console.WriteLine("\n--- Итоговая документация (Markdown) ---");
 Console.WriteLine(resultMarkdown);
